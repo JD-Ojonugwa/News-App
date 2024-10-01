@@ -1,6 +1,7 @@
 const apiBaseUrl = "https://61924d4daeab5c0017105f1a.mockapi.io/skaet/v1/";
 let currentPage = 1;
-let currentSlideIndex = 0; // Index for the image slider
+let currentSlideIndex = 0;
+let currentNewsId = null;
 
 // DOM Elements
 const newsListSection = document.getElementById("news-list");
@@ -55,6 +56,8 @@ nextBtn.onclick = () => {
 async function viewSingleNews(id) {
   newsListSection.classList.add("hidden");
   singleNewsSection.classList.remove("hidden");
+  currentNewsId = id;
+  currentSlideIndex = 0;
 
   const newsRes = await fetch(`${apiBaseUrl}news/${id}`);
   const news = await newsRes.json();
@@ -83,7 +86,9 @@ async function viewSingleNews(id) {
   commentsList.innerHTML = "";
   comments.forEach((comment) => {
     const commentItem = document.createElement("li");
-    commentItem.innerHTML = `<p>${comment.comment}</p>`;
+    commentItem.innerHTML = `<p>${comment.comment}</p>
+       <button onclick="deleteComment(${id}, ${comment.id})">Delete</button>
+    `;
     commentsList.appendChild(commentItem);
   });
 }
@@ -125,22 +130,59 @@ document
       alert("Comment cannot be empty");
       return;
     }
+    const commentData = {
+      newsId: currentNewsId,
+      name: "Anonymous", // Assuming name as "Anonymous" for now
+      comment: commentInput,
+      avatar:
+        "https://s3.amazonaws.com/uifaces/faces/twitter/koridhandy/128.jpg", // Sample avatar
+    };
 
-    // Lets assume newsId is 1 for demo
-    const res = await fetch(`${apiBaseUrl}news/1/comments`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ newsId: "1", comment: commentInput }),
-    });
+    try {
+      const res = await fetch(`${apiBaseUrl}news/${currentNewsId}/comments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(commentData),
+      });
 
-    if (res.ok) {
-      alert("Comment added successfully");
-      document.getElementById("comment-input").value = "";
-      viewSingleNews(1); // Re-fetch comments
-    } else {
-      alert("Error adding comment");
+      if (res.ok) {
+        alert("Comment added successfully");
+        document.getElementById("comment-input").value = "";
+        viewSingleNews(currentNewsId); // Re-fetch news and comments
+      } else {
+        throw new Error("Error adding comment");
+      }
+    } catch (error) {
+      alert(error.message);
     }
   });
+
+// Handle comment deletion
+async function deleteComment(newsId, commentId) {
+  const confirmDelete = confirm(
+    "Are you sure you want to delete this comment?"
+  );
+
+  if (!confirmDelete) return;
+
+  try {
+    const res = await fetch(
+      `${apiBaseUrl}news/${newsId}/comments/${commentId}`,
+      {
+        method: "DELETE",
+      }
+    );
+
+    if (res.ok) {
+      alert("Comment deleted successfully");
+      viewSingleNews(newsId); // Refresh news and comments
+    } else {
+      throw new Error("Error deleting comment");
+    }
+  } catch (error) {
+    alert(error.message);
+  }
+}
 
 // Initialize news list on page load
 window.onload = () => {
