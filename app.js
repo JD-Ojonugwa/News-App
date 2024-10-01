@@ -113,3 +113,42 @@ nextSlideBtn.onclick = () => {
     showSlide(currentSlideIndex);
   }
 };
+
+// Handle comment form submission
+document
+  .getElementById("comment-form")
+  .addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const commentInput = document.getElementById("comment-input").value;
+
+    if (!commentInput) {
+      alert("Comment cannot be empty");
+      return;
+    }
+
+    // Lets assume newsId is 1 for demo
+    const res = await fetch(`${apiBaseUrl}news/1/comments`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ newsId: "1", comment: commentInput }),
+    });
+
+    if (res.ok) {
+      alert("Comment added successfully");
+      document.getElementById("comment-input").value = "";
+      viewSingleNews(1); // Re-fetch comments
+    } else {
+      alert("Error adding comment");
+    }
+  });
+
+// Initialize news list on page load
+window.onload = () => {
+  displayNews(currentPage);
+};
+
+// Back to News List
+document.getElementById("back-to-list").onclick = () => {
+  newsListSection.classList.remove("hidden");
+  singleNewsSection.classList.add("hidden");
+};
