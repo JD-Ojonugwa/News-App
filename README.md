@@ -10,3 +10,11 @@ Comment System: Add, edit, and delete comments for each news article.
 Image Slider: Browse through images associated with each news article.
 PWA: The app is optimized as a Progressive Web App, allowing offline capabilities and better user experience on mobile devices.
 Responsive Design: Optimized for both desktop and mobile devices with media queries for responsiveness.
+
+Technologies Used
+HTML5/CSS3
+JavaScript (ES6+)
+Fetch API for making HTTP requests
+Progressive Web App (PWA)
+Netlify for deployment
+MockAPI for handling backend data (CRUD operations)
