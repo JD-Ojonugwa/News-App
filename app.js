@@ -51,7 +51,7 @@ nextBtn.onclick = () => {
   displayNews(currentPage);
 };
 
-// View single news
+// Function for viewing single news
 async function viewSingleNews(id) {
   newsListSection.classList.add("hidden");
   singleNewsSection.classList.remove("hidden");
@@ -87,68 +87,3 @@ async function viewSingleNews(id) {
     commentsList.appendChild(commentItem);
   });
 }
-
-// Slider controls
-function showSlide(index) {
-  const slides = document.querySelectorAll(".slide");
-  slides.forEach((slide, i) => {
-    slide.style.display = i === index ? "block" : "none";
-  });
-
-  prevSlideBtn.disabled = index === 0;
-  nextSlideBtn.disabled = index === slides.length - 1;
-}
-
-prevSlideBtn.onclick = () => {
-  if (currentSlideIndex > 0) {
-    currentSlideIndex--;
-    showSlide(currentSlideIndex);
-  }
-};
-
-nextSlideBtn.onclick = () => {
-  const slides = document.querySelectorAll(".slide");
-  if (currentSlideIndex < slides.length - 1) {
-    currentSlideIndex++;
-    showSlide(currentSlideIndex);
-  }
-};
-
-// Handle comment form submission
-document
-  .getElementById("comment-form")
-  .addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const commentInput = document.getElementById("comment-input").value;
-
-    if (!commentInput) {
-      alert("Comment cannot be empty");
-      return;
-    }
-
-    // Assuming newsId is 1 for demo
-    const res = await fetch(`${apiBaseUrl}news/1/comments`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ newsId: "1", comment: commentInput }),
-    });
-
-    if (res.ok) {
-      alert("Comment added successfully");
-      document.getElementById("comment-input").value = "";
-      viewSingleNews(1); // Re-fetch comments
-    } else {
-      alert("Error adding comment");
-    }
-  });
-
-// Initialize news list on page load
-window.onload = () => {
-  displayNews(currentPage);
-};
-
-// Back to News List
-document.getElementById("back-to-list").onclick = () => {
-  newsListSection.classList.remove("hidden");
-  singleNewsSection.classList.add("hidden");
-};
